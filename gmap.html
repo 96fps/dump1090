@@ -13,21 +13,13 @@
         position: absolute;
       }
       #map_canvas {
-        /*border: 1px solid black;*/
       }
       #map_canvas {
         width: 100%;
         height: 100%; 
       }
       #info {
-        /*position: absolute;*/
-        /*width:20%;*/
-        /*height:100%;*/
-        /*bottom:0px;*/
-        /*right:0px;*/
-        /*top:0px;*/
         background-color: white;
-        /*border-left:1px #666 solid;*/
         font-family:Helvetica;
       }
       #info div {
@@ -47,12 +39,12 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js">
     </script>
     <script type="text/javascript"
-      src="https://maps.googleapis.com/maps/api/js?key={yourAPIkey}">
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBpwkuwiHyrxMLHfSmPZaQ2Ro1P8rfxlUY">
     </script>
     <script type="text/javascript">
     _Map=null;
-    CenterLat=39.95;
-    CenterLon=-75.2;
+    CenterLat=40.02;
+    CenterLon=-75.21;
     Planes={};
     NumPlanes = 0;
     Selected=null
@@ -67,11 +59,12 @@
         b = parseInt(255/maxalt*invalt);
         return {
             strokeWeight: (selected ? 2 : 1),
-            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-            scale: 5,
+            // path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+            path: 'M-10,-2 -4,-3 -8,-16 -4,-16 4,-3 20,-3 24,0 20,3 4,3 -4,16 -8,16 -4,3 -10,2 -14,0 z',
+            scale: 0.67,
             fillColor: 'rgb('+r+','+g+','+b+')',
             fillOpacity: 0.9,
-            rotation: plane.track
+            rotation: -90 + plane.track
         };
     }
 
@@ -182,8 +175,8 @@
                     }
                     // Wrap y (latitude) in a like manner if you want to enable vertical infinite scrolling
 
-                    return "https://tile.openstreetmap.org/" + zoom + "/" + x + "/" + coord.y + ".png";
-                    // return "http://a.sm.mapstack.stamen.com/terrain/" + zoom + "/" + x + "/" + coord.y + ".png";
+                    // return "https://tile.openstreetmap.org/" + zoom + "/" + x + "/" + coord.y + ".png";
+                    return "http://a.sm.mapstack.stamen.com/terrain/" + zoom + "/" + x + "/" + coord.y + ".png";
                 },
                 tileSize: new google.maps.Size(256, 256),
                 name: "OpenStreetMap",
@@ -204,9 +197,9 @@
         <div id="map_canvas"></div>
         <div id="info">
           <div>
-            <h1>Dump1090</h1>
+            <h1><a href=https://github.com/96fps/dump1090>./dump1090</a></h1>
             <p id="geninfo"></p>
-            <p id="selinfo">Click on a plane for info.</p>
+            <p id="selinfo">Click on a plane for details.</p>
           </div>
         </div>
     </div>

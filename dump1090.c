@@ -2143,6 +2143,11 @@ char *aircraftsToJson(int *len) {
     p += l; buflen -= l;
     while(a) {
         int altitude = a->altitude, speed = a->speed;
+        long messages = a->messages;
+        time_t seen = a->seen;
+        time_t now = time(NULL);
+        double age = difftime(now, seen);
+
 
         /* Convert units to metric if --metric was specified. */
         if (Modes.metric) {
@@ -2154,9 +2159,13 @@ char *aircraftsToJson(int *len) {
             l = snprintf(p,buflen,
                 "{\"hex\":\"%s\", \"flight\":\"%s\", \"lat\":%f, "
                 "\"lon\":%f, \"altitude\":%d, \"track\":%d, "
-                "\"speed\":%d},\n",
+                "\"speed\":%d, "
+                "\"messages\":%ld, "
+                "\"seen\":%ju, "
+                "\"age\":%.f "
+                "},\n",
                 a->hexaddr, a->flight, a->lat, a->lon, a->altitude, a->track,
-                a->speed);
+                a->speed, messages, seen, age);
             p += l; buflen -= l;
             /* Resize if needed. */
             if (buflen < 256) {
