@@ -38,6 +38,7 @@
     </style>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js">
     </script>
+
     <script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBpwkuwiHyrxMLHfSmPZaQ2Ro1P8rfxlUY">
     </script>
@@ -46,6 +47,7 @@
     CenterLat=40.02;
     CenterLon=-75.21;
     Planes={};
+    Planes_f={};
     NumPlanes = 0;
     Selected=null
 
@@ -54,7 +56,6 @@
         var maxalt = 40000; /* Max altitude in the average case */
         var invalt = maxalt-plane.altitude;
         var selected = (Selected == plane.hex);
-
         if (invalt < 0) invalt = 0;
         b = parseInt(255/maxalt*invalt);
         return {
@@ -64,6 +65,22 @@
             scale: 0.67,
             fillColor: 'rgb('+r+','+g+','+b+')',
             fillOpacity: 0.9,
+            rotation: -90 + plane.track
+        };
+    }
+    function getIconForPlane_f(plane) {
+        var r = 0, g = 0, b = 0;
+        var selected = (Selected == plane.hex);
+        var true_age = (Date.now()-p.seen*1000)*0.001;
+        var dist = plane.speed * true_age;
+        return {
+            strokeWeight: (selected ? 2 : 1),
+            // path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+            path: 'M-10,-2 -4,-3 -8,-16 -4,-16 4,-3 20,-3 24,0 20,3 4,3 -4,16 -8,16 -4,3 -10,2 -14,0 z',
+            scale: 0.67+2,
+            fillColor: 'rgb('+r+','+g+','+b+')',
+            fillOpacity: 0.33,
+            strokeWeight: 0,
             rotation: -90 + plane.track
         };
     }
@@ -84,6 +101,7 @@
         var i = document.getElementById('geninfo');
 
         i.innerHTML = NumPlanes+' planes on screen.';
+        
     }
 
     function refreshSelectedInfo() {
@@ -98,6 +116,10 @@
         html += 'Altitude: '+p.altitude+' feet<br>';
         html += 'Speed: '+p.speed+' knots<br>';
         html += 'Coordinates: '+p.lat+', '+p.lon+'<br>';
+        html += 'Age: '+p.age+' seconds<br>';
+        html += 'Messages: '+p.messages+' packets <br>';
+        html += 'Track: '+p.track+' deg <br>';
+        html += 'nAge: '+(Date.now()-p.seen*1000)*0.001+' seconds<br>';
         i.innerHTML = html;
     }
 
@@ -123,6 +145,12 @@
                     myplane.lon = plane.lon;
                     myplane.track = plane.track;
                     myplane.flight = plane.flight;
+
+                    myplane.hex = plane.hex;
+                    myplane.messages = plane.messages;
+                    myplane.seen = plane.seen;
+                    myplane.age = plane.age;
+
                     if (myplane.hex == Selected)
                         refreshSelectedInfo();
                 } else {
@@ -144,7 +172,6 @@
                     marker.setTitle(plane.flight+' ('+plane.hex+')')
             }
             NumPlanes = data.length;
-
             /* Remove idle planes. */
             for (var p in Planes) {
                 if (!stillhere[p]) {
@@ -153,6 +180,9 @@
                 }
             }
         });
+    }
+    function predictData() {
+        //todo
     }
 
     function initialize() {
@@ -182,14 +212,19 @@
                 name: "OpenStreetMap",
                 maxZoom: 18
             }));
-        
         /* Setup our timer to poll from the server. */
+        var count = 0;
         window.setInterval(function() {
-            fetchData();
-            refreshGeneralInfo();
-        }, 1000);
+            refreshSelectedInfo();
+            predictData();
+            count++;
+            if (count>10){
+                count = 0;
+                refreshGeneralInfo();
+                fetchData();
+            }
+        }, 100);
     }
-
     </script>
   </head>
   <body onload="initialize()">
