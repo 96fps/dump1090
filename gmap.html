@@ -131,12 +131,15 @@
             html += '<b>'+p.flight+'</b><br>';
         }
         html += 'Altitude: '+p.altitude+' feet<br>';
-        html += 'Speed: '+p.speed+' knots<br>';
+        html += 'Alt_Age: '+p.age_alt+' seconds<br>';
         html += 'Coordinates: '+p.lat+', '+p.lon+'<br>';
+        html += 'Pos_Age: '+p.age_pos+' seconds<br>';
         html += 'Age: '+p.age+' seconds<br>';
         html += 'Messages: '+p.messages+' packets <br>';
         html += 'Track: '+p.track+' deg <br>';
-        html += 'nAge: '+(Date.now()-p.seen*1000)*0.001+' seconds<br>';
+        html += 'Speed: '+p.speed+' knots<br>';
+        html += 'Vel_Age: '+p.age_vel+' seconds<br>';
+        // html += 'nAge: '+(Date.now()-p.seen*1000)*0.001+' seconds<br>';
         i.innerHTML = html;
     }
 
@@ -167,6 +170,12 @@
                     myplane.messages = plane.messages;
                     myplane.seen = plane.seen;
                     myplane.age = plane.age;
+                    myplane.seen_alt = plane.seen_alt;
+                    myplane.age_alt = plane.age_alt;
+                    myplane.seen_pos = plane.seen_pos;
+                    myplane.age_pos = plane.age_pos;
+                    myplane.seen_vel = plane.seen_vel;
+                    myplane.age_vel = plane.age_vel;
 
                     if (myplane.hex == Selected)
                         refreshSelectedInfo();
