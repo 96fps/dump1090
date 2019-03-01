@@ -2182,7 +2182,7 @@ char *aircraftsToJson(int *len) {
                 "\"seen_pos\":%ju, "
                 "\"age_pos\":%.f, "
                 "\"seen_vel\":%ju, "
-                "\"age_vel;\":%.f, "
+                "\"age_vel\":%.f, "
                 "\"messages\":%ld "
                 "},\n",
                 a->hexaddr, a->flight, a->lat, a->lon, a->altitude, a->track,
