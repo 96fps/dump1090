@@ -58,20 +58,37 @@
         var selected = (Selected == plane.hex);
         if (invalt < 0) invalt = 0;
         b = parseInt(255/maxalt*invalt);
-        return {
-            strokeWeight: (selected ? 2 : 1),
-            // path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-            path: 'M-10,-2 -4,-3 -8,-16 -4,-16 4,-3 20,-3 24,0 20,3 4,3 -4,16 -8,16 -4,3 -10,2 -14,0 z',
-            scale: 0.67,
-            fillColor: 'rgb('+r+','+g+','+b+')',
-            fillOpacity: 0.9,
-            rotation: -90 + plane.track
-        };
+        var true_age = (Date.now()-plane.seen*1000)*0.001;
+
+        if (true_age > 10){
+            r = 0, g = 0, b = 0;
+             return {
+                strokeWeight: (selected ? 2 : 1),
+                // path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                path: 'M-10,-2 -4,-3 -8,-16 -4,-16 4,-3 20,-3 24,0 20,3 4,3 -4,16 -8,16 -4,3 -10,2 -14,0 z',
+                scale: 0.67,
+                fillColor: 'rgb('+r+','+g+','+b+')',
+                fillOpacity: 0.33,
+                strokeWeight: 0,
+                rotation: -90 + plane.track
+            };
+        }
+        else{
+            return {
+                strokeWeight: (selected ? 2 : 1),
+                // path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                path: 'M-10,-2 -4,-3 -8,-16 -4,-16 4,-3 20,-3 24,0 20,3 4,3 -4,16 -8,16 -4,3 -10,2 -14,0 z',
+                scale: 0.67,
+                fillColor: 'rgb('+r+','+g+','+b+')',
+                fillOpacity: 0.9,
+                rotation: -90 + plane.track
+            };
+        }
     }
     function getIconForPlane_f(plane) {
         var r = 0, g = 0, b = 0;
         var selected = (Selected == plane.hex);
-        var true_age = (Date.now()-p.seen*1000)*0.001;
+        var true_age = (Date.now()-plane.seen*1000)*0.001;
         var dist = plane.speed * true_age;
         return {
             strokeWeight: (selected ? 2 : 1),
@@ -210,7 +227,7 @@
                 },
                 tileSize: new google.maps.Size(256, 256),
                 name: "OpenStreetMap",
-                maxZoom: 18
+                maxZoom: 15
             }));
         /* Setup our timer to poll from the server. */
         var count = 0;
