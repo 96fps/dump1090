@@ -2175,18 +2175,18 @@ char *aircraftsToJson(int *len) {
                 "{\"hex\":\"%s\", \"flight\":\"%s\", \"lat\":%f, "
                 "\"lon\":%f, \"altitude\":%d, \"track\":%d, "
                 "\"speed\":%d, "
-                "\"messages\":%ld, "
                 "\"seen\":%ju, "
-                "\"age\":%.f "
+                "\"age\":%.f, "
                 "\"seen_alt\":%ju, "
-                "\"age_alt\":%.f "
+                "\"age_alt\":%.f, "
                 "\"seen_pos\":%ju, "
-                "\"age_pos\":%.f "
+                "\"age_pos\":%.f, "
                 "\"seen_vel\":%ju, "
-                "\"age_vel;\":%.f "
+                "\"age_vel;\":%.f, "
+                "\"messages\":%ld "
                 "},\n",
                 a->hexaddr, a->flight, a->lat, a->lon, a->altitude, a->track,
-                a->speed, messages, seen, age, seen_alt, age_alt, seen_pos, age_pos, seen_vel, age_vel);
+                a->speed, seen, age, seen_alt, age_alt, seen_pos, age_pos, seen_vel, age_vel, messages);
             p += l; buflen -= l;
             /* Resize if needed. */
             if (buflen < 256) {
