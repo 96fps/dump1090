@@ -110,6 +110,9 @@ struct aircraft {
     int speed;          /* Velocity computed from EW and NS components. */
     int track;          /* Angle of flight. */
     time_t seen;        /* Time at which the last packet was received. */
+    time_t seen_alt;    /* Time at which the last altitude packet was received. */
+    time_t seen_pos;    /* Time at which the last location packet-pair was decoded. */
+    time_t seen_vel;    /* Time at which the last heading/speed packet was received. */
     long messages;      /* Number of Mode S messages received. */
     /* Encoded latitude and longitude as extracted by odd and even
      * CPR encoded messages. */
@@ -1581,6 +1584,9 @@ struct aircraft *interactiveCreateAircraft(uint32_t addr) {
     a->lat = 0;
     a->lon = 0;
     a->seen = time(NULL);
+    a->seen_alt = -1;
+    a->seen_pos = -1;
+    a->seen_vel = -1;
     a->messages = 0;
     a->next = NULL;
     return a;
@@ -1765,6 +1771,7 @@ struct aircraft *interactiveReceiveData(struct modesMessage *mm) {
 
     if (mm->msgtype == 0 || mm->msgtype == 4 || mm->msgtype == 20) {
         a->altitude = mm->altitude;
+        a->seen_alt = time(NULL);
     } else if (mm->msgtype == 17) {
         if (mm->metype >= 1 && mm->metype <= 4) {
             memcpy(a->flight, mm->flight, sizeof(a->flight));
@@ -1783,11 +1790,13 @@ struct aircraft *interactiveReceiveData(struct modesMessage *mm) {
              * the position. */
             if (abs(a->even_cprtime - a->odd_cprtime) <= 10000) {
                 decodeCPR(a);
+                a->seen_pos = time(NULL);
             }
         } else if (mm->metype == 19) {
             if (mm->mesub == 1 || mm->mesub == 2) {
                 a->speed = mm->velocity;
                 a->track = mm->heading;
+                a->seen_vel = time(NULL);
             }
         }
     }
@@ -2145,8 +2154,14 @@ char *aircraftsToJson(int *len) {
         int altitude = a->altitude, speed = a->speed;
         long messages = a->messages;
         time_t seen = a->seen;
+        time_t seen_alt = a->seen_alt;
+        time_t seen_pos = a->seen_pos;
+        time_t seen_vel = a->seen_vel;
         time_t now = time(NULL);
         double age = difftime(now, seen);
+        double age_alt = difftime(now, seen_alt);
+        double age_pos = difftime(now, seen_pos);
+        double age_vel = difftime(now, seen_vel);
 
 
         /* Convert units to metric if --metric was specified. */
@@ -2163,9 +2178,15 @@ char *aircraftsToJson(int *len) {
                 "\"messages\":%ld, "
                 "\"seen\":%ju, "
                 "\"age\":%.f "
+                "\"seen_alt\":%ju, "
+                "\"age_alt\":%.f "
+                "\"seen_pos\":%ju, "
+                "\"age_pos\":%.f "
+                "\"seen_vel\":%ju, "
+                "\"age_vel;\":%.f "
                 "},\n",
                 a->hexaddr, a->flight, a->lat, a->lon, a->altitude, a->track,
-                a->speed, messages, seen, age);
+                a->speed, messages, seen, age, seen_alt, age_alt, seen_pos, age_pos, seen_vel, age_vel);
             p += l; buflen -= l;
             /* Resize if needed. */
             if (buflen < 256) {
