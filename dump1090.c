@@ -2213,6 +2213,7 @@ char *aircraftsToJson(int *len) {
 
 #define MODES_CONTENT_TYPE_HTML "text/html;charset=utf-8"
 #define MODES_CONTENT_TYPE_JSON "application/json;charset=utf-8"
+#define MODES_CONTENT_TYPE_JS "application/javascript;charset=utf-8"
 
 /* Get an HTTP request header and write the response to the client.
  * Again here we assume that the socket buffer is enough without doing
@@ -2259,7 +2260,30 @@ int handleHTTPRequest(struct client *c) {
     if (strstr(url, "/data.json")) {
         content = aircraftsToJson(&clen);
         ctype = MODES_CONTENT_TYPE_JSON;
-    } else {
+    }
+    else if (strstr(url, "/particle.js")) {
+        struct stat sbuf;
+        int fd = -1;
+
+        if (stat("particle.js",&sbuf) != -1 &&
+            (fd = open("particle.js",O_RDONLY)) != -1)
+        {
+            content = malloc(sbuf.st_size);
+            if (read(fd,content,sbuf.st_size) == -1) {
+                snprintf(content,sbuf.st_size,"Error reading from file: %s",
+                    strerror(errno));
+            }
+            clen = sbuf.st_size;
+        } else {
+            char buf[128];
+
+            clen = snprintf(buf,sizeof(buf),"Error opening JS file: %s",
+                strerror(errno));
+            content = strdup(buf);
+        }
+        if (fd != -1) close(fd);
+        ctype = MODES_CONTENT_TYPE_JS;
+    }else {
         struct stat sbuf;
         int fd = -1;
 

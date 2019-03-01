@@ -11,6 +11,11 @@
       }
       #container #map_canvas, #info {
         position: absolute;
+        z-index : 20;
+      } 
+      #particle {
+        position: absolute;
+        z-index : 30;
       }
       #map_canvas {
       }
@@ -36,11 +41,17 @@
         color:#333;
       }
     </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/addons/p5.dom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/addons/p5.sound.min.js"></script>
+
+
     <script src="https://code.jquery.com/jquery-3.3.1.min.js">
     </script>
-
     <script type="text/javascript"
-      src="https://maps.googleapis.com/maps/api/js?key={YOUR_API_KEY}">
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBpwkuwiHyrxMLHfSmPZaQ2Ro1P8rfxlUY">
+      // src="https://maps.googleapis.com/maps/api/js?key={YOUR_API_KEY}">
     </script>
     <script type="text/javascript">
     _Map=null;
@@ -118,7 +129,6 @@
         var i = document.getElementById('geninfo');
 
         i.innerHTML = NumPlanes+' planes on screen.';
-        
     }
 
     function refreshSelectedInfo() {
@@ -126,21 +136,24 @@
         var p = Planes[Selected];
 
         if (!p) return;
-        var html = 'ICAO: '+p.hex+'<br>';
+        var html = 'ICAO: '+p.hex+'';
+        html += ' ('+p.age+' sec) ';
         if (p.flight.length) {
-            html += '<b>'+p.flight+'</b><br>';
+            html += 'aka: <b>'+p.flight+'</b><br>';
         }
-        html += 'Altitude: '+p.altitude+' feet<br>';
-        html += 'Alt_Age: '+p.age_alt+' seconds<br>';
-        html += 'Coordinates: '+p.lat+', '+p.lon+'<br>';
-        html += 'Pos_Age: '+p.age_pos+' seconds<br>';
-        html += 'Age: '+p.age+' seconds<br>';
-        html += 'Messages: '+p.messages+' packets <br>';
+        html += 'Altitude: '+p.altitude+' ft';
+        html += ' ('+p.age_alt+' sec)<br>';
+        html += 'Lat/Lon: '+p.lat.toFixed(3)+', '+p.lon.toFixed(3)+'';
+        html += ' ('+p.age_pos+' sec)<br>';
+        html += 'Messages: '+p.messages+' packets <br>';    
         html += 'Track: '+p.track+' deg <br>';
-        html += 'Speed: '+p.speed+' knots<br>';
-        html += 'Vel_Age: '+p.age_vel+' seconds<br>';
+        html += 'Speed: '+p.speed+' knots';
+        html += ' ('+p.age_vel+' sec)<br>';
+        
+
         // html += 'nAge: '+(Date.now()-p.seen*1000)*0.001+' seconds<br>';
         i.innerHTML = html;
+
     }
 
     function fetchData() {
@@ -243,27 +256,38 @@
         window.setInterval(function() {
             refreshSelectedInfo();
             predictData();
-            count++;
-            if (count>10){
-                count = 0;
-                refreshGeneralInfo();
                 fetchData();
-            }
+            
+            // count++;
+            // if (count>10){
+            //     count = 0;
+            //     refreshGeneralInfo();
+            //     fetchData();
+            // }
         }, 100);
     }
     </script>
   </head>
   <body onload="initialize()">
+  <!-- <body> -->
     <div id="container">
-        <div id="map_canvas"></div>
+        <div id="particle">
+        <script src="particle.js"></script>   
+        </div>
+
+        <div id="map_canvas">
+        </div>
         <div id="info">
           <div>
             <h1><a href=https://github.com/96fps/dump1090>./dump1090</a></h1>
             <p id="geninfo"></p>
             <p id="selinfo">Click on a plane for details.</p>
-          </div>
+        </div>
+
+
         </div>
     </div>
+    
   </body>
 </html>
 
